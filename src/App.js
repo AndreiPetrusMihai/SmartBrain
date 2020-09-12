@@ -26,6 +26,21 @@ particles: {
 }
 }
 
+const initialState = {
+      input:'',
+      imageUrl:'',
+      box: {},
+      route: 'signin',
+      isSignedIn: false,
+      user: {
+        id:"",
+        name: '',
+        email:'',
+        entries: 0,
+        joined: ''
+      }   
+}
+
 class App extends React.Component {
   constructor(){
     super();
@@ -46,13 +61,14 @@ class App extends React.Component {
   }
 
   loadUser = (data) =>{
-      this.setState({user:{
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        entries: data.entries,
-        joined: data.joined
-      }});
+    this.setState({user:{
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    }});
+    console.log('userloaded');
   }
 
   calculateFaceLocation = (data) =>{
@@ -97,6 +113,9 @@ class App extends React.Component {
         .then(count => {
           this.setState(Object.assign(this.state.user,{entries:count}))
         })
+        .catch(err=>{
+          console.log(err);
+        })
       }
       this.displayFaceBox(this.calculateFaceLocation(response))
       })
@@ -104,9 +123,11 @@ class App extends React.Component {
   }
 
   onRouteChange = (route) =>{
+
     if (route ==='signout')
     {
-        this.setState({isSignedIn: false});
+        this.setState(initialState);
+
     } else if(route === 'home'){
       this.setState({isSignedIn:true});
     }
@@ -122,7 +143,8 @@ class App extends React.Component {
         <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn}/>
       </div>
 
-      { this.state.route === 'home' 
+      {
+      this.state.route === 'home' 
       ?
       <div>
         <Rank name={this.state.user.name} entries={this.state.user.entries}/>
@@ -137,9 +159,6 @@ class App extends React.Component {
       :
       <Register onRouteChange={this.onRouteChange} loadUser={this.loadUser}/>
       )}
-
-
-
       </div>
   );
   }
